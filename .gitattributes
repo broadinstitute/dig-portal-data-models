@@ -1,0 +1,2 @@
+raw/**/*.owl filter=lfs diff=lfs merge=lfs -text
+raw/**/*.tsv filter=lfs diff=lfs merge=lfs -text
