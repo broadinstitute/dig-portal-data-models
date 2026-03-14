@@ -167,6 +167,25 @@ uv run python scripts/phenotype/05_quality_report.py --version 0.0.2
 - [ ] No `MESH:none` or other invalid target IDs in output
 - [ ] All ontology prefixes are uppercase (MESH, ORPHANET, not MeSH, Orphanet)
 
+## Git LFS
+
+Large source files (OWL ontologies, GWAS Catalog TSVs) are stored with [Git LFS](https://git-lfs.github.com/). You need it installed to clone and work with this repo.
+
+```bash
+# Install git-lfs (macOS)
+brew install git-lfs
+
+# After cloning, pull LFS files
+git lfs install
+git lfs pull
+```
+
+If you cloned without LFS, the large files will be pointer stubs. Run `git lfs pull` to download the actual content.
+
+Tracked patterns (see `.gitattributes`):
+- `raw/**/*.owl` — EFO (330 MB), ORDO (45 MB)
+- `raw/**/*.tsv` — GWAS Catalog (59 MB, 30 MB), Phenotypes, MeSH mappings
+
 ## Dependencies
 
 Defined in `pyproject.toml`. Install with `uv sync`.

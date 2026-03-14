@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Bash(*)",
+      "Glob",
+      "Grep",
+      "Agent(*)",
+      "WebFetch",
+      "WebSearch",
+      "mcp__ontology-lookup-service__*",
+      "mcp__open-targets__*",
+      "mcp__context7__*",
+      "mcp__simage-dock__*",
+      "mcp__simage-dock-local__*",
+      "mcp__MCP_DOCKER__*",
+      "mcp__ide__*"
+    ]
+  }
+}
