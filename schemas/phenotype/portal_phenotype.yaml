@@ -1,0 +1,207 @@
+id: https://kp.a2f.org/portal-phenotype-model
+name: portal-phenotype-model
+title: A2F Knowledge Portal Phenotype Data Model
+description: >-
+  Unified data model for phenotypes tracked in the A2F Knowledge Portal,
+  with stable numeric IDs, legacy identifiers, trait type classification,
+  and cross-ontology mappings following SSSOM conventions.
+version: "0.1.0"
+
+prefixes:
+  portal: https://kp.a2f.org/phenotype/
+  linkml: https://w3id.org/linkml/
+  skos: http://www.w3.org/2004/02/skos/core#
+  sssom: https://w3id.org/sssom/
+  semapv: https://w3id.org/semapv/vocab/
+  efo: http://www.ebi.ac.uk/efo/
+  mondo: http://purl.obolibrary.org/obo/MONDO_
+  mesh: http://id.nlm.nih.gov/mesh/
+  hp: http://purl.obolibrary.org/obo/HP_
+  doid: http://purl.obolibrary.org/obo/DOID_
+  ordo: http://www.orpha.net/ORDO/Orphanet_
+  chebi: http://purl.obolibrary.org/obo/CHEBI_
+  oba: http://purl.obolibrary.org/obo/OBA_
+  cmo: http://purl.obolibrary.org/obo/CMO_
+
+default_range: string
+
+imports:
+  - linkml:types
+
+classes:
+  PortalPhenotypeCollection:
+    description: A collection of portal phenotype records.
+    tree_root: true
+    attributes:
+      phenotypes:
+        range: PortalPhenotype
+        multivalued: true
+        inlined_as_list: true
+
+  PortalPhenotype:
+    description: >-
+      A phenotype tracked in the A2F Knowledge Portal, with a stable numeric ID,
+      legacy identifiers, classification, and cross-ontology mappings.
+    attributes:
+      portal_id:
+        range: string
+        required: true
+        identifier: true
+        description: "Stable numeric ID (e.g., PORTAL:0000001)"
+        pattern: "^PORTAL:\\d{7}$"
+      legacy_id:
+        range: string
+        required: true
+        description: "Original text-based phenotype ID from Phenotypes.tsv"
+      legacy_trait_group:
+        range: TraitGroupEnum
+        required: true
+      phenotype_name:
+        range: string
+        required: true
+        description: "Human-readable phenotype label"
+      description:
+        range: string
+        description: "Extended description if available"
+      display_group:
+        range: string
+        description: "Disease area category (e.g., CARDIOVASCULAR)"
+      trait_type:
+        range: TraitTypeEnum
+        required: true
+      is_dichotomous:
+        range: boolean
+        description: "Whether this is a case/control (dichotomous) phenotype"
+      component_phenotypes:
+        range: string
+        multivalued: true
+        description: "For composite/interaction phenotypes, PORTAL IDs of the component phenotypes"
+      primary_mapping:
+        range: OntologyMapping
+        inlined: true
+        description: "The single best ontology mapping for this phenotype"
+      mappings:
+        range: OntologyMapping
+        multivalued: true
+        inlined_as_list: true
+        description: "All cross-ontology mappings"
+
+  OntologyMapping:
+    description: >-
+      A mapping from a portal phenotype to an external ontology term,
+      following SSSOM conventions.
+    attributes:
+      target_id:
+        range: uriorcurie
+        required: true
+        description: "External ontology ID (e.g., EFO:0000275, MESH:D001281)"
+      target_label:
+        range: string
+        description: "Human-readable label of the target term"
+      target_ontology:
+        range: OntologyEnum
+        required: true
+      mapping_predicate:
+        range: MappingPredicateEnum
+        required: true
+        description: "SKOS predicate describing the relationship"
+      mapping_justification:
+        range: MappingJustificationEnum
+        description: "How this mapping was determined"
+      confidence:
+        range: float
+        minimum_value: 0.0
+        maximum_value: 1.0
+        description: "Confidence score (1.0 = manually curated exact match)"
+      source:
+        range: string
+        description: "Which source file or process produced this mapping"
+      notes:
+        range: string
+        description: "Additional notes or justification"
+
+enums:
+  TraitGroupEnum:
+    permissible_values:
+      portal:
+        description: "Core portal phenotype"
+      gcat_trait:
+        description: "GWAS Catalog-sourced trait"
+      rare_v2:
+        description: "Rare disease from Orphanet"
+
+  TraitTypeEnum:
+    permissible_values:
+      disease:
+        description: "A diagnosable disease or condition"
+      measurement:
+        description: "A quantitative measurement or biomarker"
+      phenotype:
+        description: "An observable characteristic (not disease or measurement)"
+      rare_disease:
+        description: "Rare disease from Orphanet registry"
+      interaction:
+        description: "Gene-environment or trait-trait interaction (e.g., AFxBMI)"
+      stratified:
+        description: "Trait within a subpopulation (e.g., AlbInT2D)"
+      adjusted:
+        description: "Trait adjusted for covariates (e.g., ISIadjAgeSexBMI)"
+      subgroup:
+        description: "Age/sex/ancestry-specific subgroup analysis"
+      composite:
+        description: "Combined or alternative phenotype definitions (e.g., AD_or_AD_history)"
+
+  OntologyEnum:
+    permissible_values:
+      EFO:
+        description: "Experimental Factor Ontology"
+      MESH:
+        description: "Medical Subject Headings"
+      MONDO:
+        description: "Mondo Disease Ontology"
+      HP:
+        description: "Human Phenotype Ontology"
+      DOID:
+        description: "Disease Ontology"
+      ORPHANET:
+        description: "Orphanet Rare Disease Ontology"
+      CHEBI:
+        description: "Chemical Entities of Biological Interest"
+      OBA:
+        description: "Ontology of Biological Attributes"
+      CMO:
+        description: "Clinical Measurement Ontology"
+
+  MappingPredicateEnum:
+    permissible_values:
+      "skos:exactMatch":
+        description: "Exact semantic equivalence"
+      "skos:closeMatch":
+        description: "Sufficiently similar to be used interchangeably in some contexts"
+      "skos:broadMatch":
+        description: "Target is broader/more general than the portal phenotype"
+      "skos:narrowMatch":
+        description: "Target is narrower/more specific than the portal phenotype"
+      "skos:relatedMatch":
+        description: "Associative mapping (e.g., component of a composite phenotype)"
+
+  MappingJustificationEnum:
+    permissible_values:
+      manual_curation:
+        description: "Manually curated by a domain expert"
+        meaning: semapv:ManualMappingCuration
+      lexical_match:
+        description: "Automated exact or fuzzy text match"
+        meaning: semapv:LexicalMatching
+      cross_reference:
+        description: "Extracted from ontology cross-references (hasDbXref)"
+        meaning: semapv:MappingByLogicalReasoning
+      semantic_similarity:
+        description: "Embedding-based similarity search"
+        meaning: semapv:SemanticSimilarityThresholdMatching
+      gwas_catalog:
+        description: "Derived from GWAS Catalog MAPPED_TRAIT_URI"
+        meaning: semapv:MappingByLogicalReasoning
+      inherited:
+        description: "Inherited from a prior mapping file (portal_to_mesh or AMP)"
+        meaning: semapv:ManualMappingCuration

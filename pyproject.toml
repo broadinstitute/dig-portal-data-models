@@ -1,0 +1,23 @@
+[project]
+name = "portal-data-models"
+version = "0.1.0"
+description = "Unified data model for A2F Knowledge Portal phenotypes"
+requires-python = ">=3.9"
+dependencies = [
+    "linkml>=1.7",
+    "linkml-runtime>=1.7",
+    "sssom>=0.4",
+    "pronto>=2.5",
+    "rdflib>=7.0",
+    "aiohttp>=3.9",
+    "pandas>=2.0",
+    "openpyxl>=3.1",
+    "python-dotenv>=1.0",
+]
+
+[tool.setuptools]
+packages = []
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
