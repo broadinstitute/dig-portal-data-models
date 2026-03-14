@@ -2,6 +2,8 @@
 
 Unified, standards-compliant data models for phenotypes and other entities used across the [A2F Knowledge Portal](https://a2f.hugeamp.org/) and related Flannick Lab resources.
 
+**[Browse the phenotype mappings interactively](https://akleao.com/preview/561bd3b1-8308-43f2-a9af-4deae461c61b)**
+
 ## What's in here
 
 Each phenotype in the portal gets:
