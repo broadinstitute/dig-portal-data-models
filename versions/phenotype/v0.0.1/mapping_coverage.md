@@ -3,7 +3,7 @@
 ## Overall Summary
 
 - **Total phenotypes**: 6982
-- **Total mappings**: 21081
+- **Total mappings**: 18693
 - **Phenotypes with any mapping**: 6982 (100.0%)
 - **Phenotypes with NO mapping**: 0 (0.0%)
 
@@ -11,23 +11,24 @@
 
 | Ontology | Mapped | % of Total |
 |----------|--------|------------|
-| EFO | 5590 | 80.1% |
-| MESH | 2706 | 38.8% |
-| MONDO | 1333 | 19.1% |
-| HP | 453 | 6.5% |
-| DOID | 741 | 10.6% |
+| EFO | 5568 | 79.7% |
+| MESH | 2610 | 37.4% |
+| MONDO | 1225 | 17.5% |
+| HP | 430 | 6.2% |
+| DOID | 718 | 10.3% |
 | ORPHANET | 1679 | 24.0% |
-| CHEBI | 27 | 0.4% |
+| CHEBI | 30 | 0.4% |
 | OBA | 613 | 8.8% |
 | CMO | 14 | 0.2% |
+| ICD10CM | 429 | 6.1% |
 
 ## Coverage by Trait Group
 
 | Trait Group | Total | EFO | MESH | MONDO | ORPHANET | Any | None |
 |-------------|-------|-----|------|-------|----------|-----|------|
-| portal | 1437 | 1437 (100%) | 959 (67%) | 249 (17%) | 54 (4%) | 1437 (100%) | 0 (0%) |
-| gcat_trait | 4022 | 4022 (100%) | 1259 (31%) | 417 (10%) | 102 (3%) | 4022 (100%) | 0 (0%) |
-| rare_v2 | 1523 | 131 (9%) | 488 (32%) | 667 (44%) | 1523 (100%) | 1523 (100%) | 0 (0%) |
+| portal | 1437 | 1437 (100%) | 943 (66%) | 232 (16%) | 54 (4%) | 1437 (100%) | 0 (0%) |
+| gcat_trait | 4022 | 4022 (100%) | 1208 (30%) | 396 (10%) | 102 (3%) | 4022 (100%) | 0 (0%) |
+| rare_v2 | 1523 | 109 (7%) | 459 (30%) | 597 (39%) | 1523 (100%) | 1523 (100%) | 0 (0%) |
 
 ## Quality Targets
 
@@ -41,10 +42,11 @@
 
 | Predicate | Count | % |
 |-----------|-------|---|
-| skos:exactMatch | 15457 | 73.3% |
-| skos:closeMatch | 3309 | 15.7% |
-| skos:broadMatch | 2023 | 9.6% |
-| skos:relatedMatch | 292 | 1.4% |
+| skos:exactMatch | 15514 | 83.0% |
+| skos:broadMatch | 2066 | 11.1% |
+| oboInOwl:hasDbXref | 469 | 2.5% |
+| skos:closeMatch | 352 | 1.9% |
+| skos:relatedMatch | 292 | 1.6% |
 
 ## Trait Type Distribution
 

@@ -22,6 +22,7 @@ prefixes:
   chebi: http://purl.obolibrary.org/obo/CHEBI_
   oba: http://purl.obolibrary.org/obo/OBA_
   cmo: http://purl.obolibrary.org/obo/CMO_
+  icd10cm: http://purl.bioontology.org/ontology/ICD10CM/
 
 default_range: string
 
@@ -171,6 +172,8 @@ enums:
         description: "Ontology of Biological Attributes"
       CMO:
         description: "Clinical Measurement Ontology"
+      ICD10CM:
+        description: "ICD-10 Clinical Modification"
 
   MappingPredicateEnum:
     permissible_values:
