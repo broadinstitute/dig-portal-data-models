@@ -62,7 +62,7 @@ def main():
         mapped_by_predicate[row["predicate_id"]] += 1
 
     group_stats = {}
-    for group_name, group_df in registry.groupby("legacy_trait_group"):
+    for group_name, group_df in registry.groupby("gwas_source_category"):
         group_ids = set(group_df["portal_id"])
         stats = {"total": len(group_ids)}
         for ont in ["EFO", "MESH", "MONDO", "HP", "DOID", "ORPHANET", "CHEBI", "OBA", "CMO", "ICD10CM"]:
@@ -121,7 +121,7 @@ def main():
     rare_s = group_stats.get("rare_v2", {})
     portal_efo_mondo = len(
         (mapped_by_ontology.get("EFO", set()) | mapped_by_ontology.get("MONDO", set()) | mapped_by_ontology.get("MESH", set()))
-        & set(registry[registry["legacy_trait_group"] == "portal"]["portal_id"])
+        & set(registry[registry["gwas_source_category"] == "portal"]["portal_id"])
     )
     check = lambda actual, target: "PASS" if actual >= target else "FAIL"
 

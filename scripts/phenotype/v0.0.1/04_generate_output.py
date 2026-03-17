@@ -61,8 +61,8 @@ def assign_portal_ids(records: list[dict]) -> list[dict]:
     group_order = {"portal": 0, "gcat_trait": 1, "rare_v2": 2}
     records.sort(
         key=lambda r: (
-            group_order.get(r["trait_group"], 9),
-            r.get("display_group", ""),
+            group_order.get(r["gwas_source_category"], 9),
+            r.get("legacy_trait_group", ""),
             r.get("phenotype", ""),
         )
     )
@@ -95,8 +95,8 @@ def select_primary_mapping(mappings: list[dict]) -> dict | None:
 
 def generate_registry(records: list[dict], output_path: Path):
     fieldnames = [
-        "portal_id", "legacy_trait_group", "legacy_phenotype_id",
-        "phenotype_name", "display_group", "trait_type",
+        "portal_id", "gwas_source_category", "legacy_phenotype_id",
+        "phenotype_name", "legacy_trait_group", "trait_group", "trait_type",
     ]
     with open(output_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames, delimiter="\t")
@@ -104,10 +104,11 @@ def generate_registry(records: list[dict], output_path: Path):
         for r in records:
             writer.writerow({
                 "portal_id": r["portal_id"],
-                "legacy_trait_group": r["trait_group"],
+                "gwas_source_category": r["gwas_source_category"],
                 "legacy_phenotype_id": r["phenotype"],
                 "phenotype_name": r["phenotype_name"],
-                "display_group": r.get("display_group", ""),
+                "legacy_trait_group": r.get("legacy_trait_group", ""),
+                "trait_group": r.get("trait_group", "other"),
                 "trait_type": r["trait_type"],
             })
     print(f"  Wrote registry: {output_path} ({len(records)} entries)")
@@ -167,9 +168,10 @@ def generate_linkml_instances(records: list[dict], output_path: Path):
         pheno = {
             "portal_id": r["portal_id"],
             "legacy_id": r["phenotype"],
-            "legacy_trait_group": r["trait_group"],
+            "gwas_source_category": r["gwas_source_category"],
             "phenotype_name": r["phenotype_name"],
-            "display_group": r.get("display_group", ""),
+            "legacy_trait_group": r.get("legacy_trait_group", ""),
+            "trait_group": r.get("trait_group", "other"),
             "trait_type": r["trait_type"],
         }
         if r.get("amp_description"):
@@ -212,6 +214,59 @@ def generate_linkml_instances(records: list[dict], output_path: Path):
     print(f"  Wrote LinkML instances: {output_path} ({len(phenotypes)} phenotypes)")
 
 
+def generate_flattened_tsv(records: list[dict], output_path: Path):
+    """Generate a flattened TSV with one row per mapping, all phenotype fields repeated."""
+    fieldnames = [
+        "portal_id", "gwas_source_category", "legacy_trait_group", "trait_group",
+        "phenotype", "phenotype_name", "description", "trait_type",
+        "is_dichotomous", "is_complex", "mapping_count",
+        "target_id", "target_label", "target_ontology",
+        "mapping_predicate", "confidence", "mapping_justification", "source",
+    ]
+
+    total = 0
+    with open(output_path, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames, delimiter="\t")
+        writer.writeheader()
+
+        for r in records:
+            mappings = r.get("mappings", [])
+            pheno_fields = {
+                "portal_id": r["portal_id"],
+                "gwas_source_category": r["gwas_source_category"],
+                "legacy_trait_group": r.get("legacy_trait_group", ""),
+                "trait_group": r.get("trait_group", "other"),
+                "phenotype": r["phenotype"],
+                "phenotype_name": r["phenotype_name"],
+                "description": r.get("amp_description", ""),
+                "trait_type": r["trait_type"],
+                "is_dichotomous": r.get("amp_dichotomous", ""),
+                "is_complex": "true" if r.get("amp_complex") == "complex" else ("false" if r.get("amp_complex") == "simple" else ""),
+                "mapping_count": len(mappings),
+            }
+
+            if not mappings:
+                total += 1
+                writer.writerow({**pheno_fields, "target_id": "", "target_label": "",
+                    "target_ontology": "", "mapping_predicate": "", "confidence": "",
+                    "mapping_justification": "", "source": ""})
+            else:
+                for m in mappings:
+                    total += 1
+                    writer.writerow({
+                        **pheno_fields,
+                        "target_id": m.get("target_id", ""),
+                        "target_label": m.get("target_label", ""),
+                        "target_ontology": m.get("target_ontology", ""),
+                        "mapping_predicate": m.get("mapping_predicate", ""),
+                        "confidence": m.get("confidence", ""),
+                        "mapping_justification": m.get("mapping_justification", ""),
+                        "source": m.get("source", ""),
+                    })
+
+    print(f"  Wrote flattened TSV: {output_path} ({total} rows)")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Generate versioned portal phenotype output")
     parser.add_argument("--version", default="0.0.1", help="Version string (default: 0.0.1)")
@@ -237,6 +292,7 @@ def main():
     generate_registry(records, version_dir / "portal_phenotype_registry.tsv")
     generate_sssom(records, version_dir / "portal_phenotype_mappings.sssom.tsv", version)
     generate_linkml_instances(records, version_dir / "portal_phenotypes.yaml")
+    generate_flattened_tsv(records, version_dir / "portal_phenotypes_flat.tsv")
 
     print(f"\nOutput: {version_dir}/")
     print(f"\nTo validate:")

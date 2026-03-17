@@ -60,10 +60,11 @@ portal-data-models/
 │
 ├── versions/phenotype/                    # Versioned output (checked into git)
 │   └── v0.0.1/
-│       ├── portal_phenotypes.yaml
-│       ├── portal_phenotype_mappings.sssom.tsv
-│       ├── portal_phenotype_registry.tsv
-│       └── mapping_coverage.md
+│       ├── portal_phenotypes.yaml              # Full phenotype collection (LinkML)
+│       ├── portal_phenotypes_flat.tsv          # Flattened one-row-per-mapping TSV
+│       ├── portal_phenotype_mappings.sssom.tsv # SSSOM mapping set
+│       ├── portal_phenotype_registry.tsv       # ID registry
+│       └── mapping_coverage.md                 # Quality report
 │
 ├── .env                                   # API keys (optional, gitignored)
 └── pyproject.toml
@@ -156,7 +157,7 @@ The base version runs 5 steps via `generate.sh`:
 | 1 | `01_parse_sources.py` | Parse Phenotypes.tsv, MeSH mappings, AMP/EFO mappings, GWAS Catalog, Orphanet IDs | ~5s |
 | 2 | `02_parse_efo_xrefs.py` | Extract cross-references from EFO and ORDO OWL files | ~75s |
 | 3 | `03_enrich.py` | 7-phase enrichment: xref expansion, OLS API, GWAS Catalog, broad EFO, ICD10CM chaining, label backfill, validation | ~4 min |
-| 4 | `04_generate_output.py` | Assign PORTAL IDs, generate SSSOM + YAML + registry | ~5s |
+| 4 | `04_generate_output.py` | Assign PORTAL IDs, generate SSSOM + YAML + registry + flattened TSV | ~5s |
 | 5 | `05_quality_report.py` | Generate mapping coverage report | ~2s |
 
 Flags: `--skip-owl` reuses cached OWL cross-references. `--skip-api` skips OLS/OMIM API calls.
@@ -169,25 +170,18 @@ Flags: `--skip-owl` reuses cached OWL cross-references. `--skip-api` skips OLS/O
 | >95% rare disease phenotypes mapped to ORPHANET | 100% |
 | >80% GWAS Catalog traits mapped to EFO | 100% |
 
-## Manual review workflow
+## Reviewing mappings
 
-To review mappings in a spreadsheet and create a corrected version:
+Every version includes `portal_phenotypes_flat.tsv` — a flattened one-row-per-mapping TSV with all phenotype and mapping fields. Open it in Excel, Google Sheets, or any dashboard tool to browse, filter, and spot-check mappings.
 
-```bash
-# 1. Export review spreadsheet from current data
-uv run python scripts/phenotype/v0.0.1/09_export_review_table.py
+Key columns for review:
+- `gwas_source_category` — source collection (portal, gcat_trait, rare_v2)
+- `legacy_trait_group` — original display group from Phenotypes.tsv
+- `trait_group` — standardized biological category (30 groups, consolidated from 55 legacy groups)
+- `mapping_predicate` — filter by `skos:exactMatch` to review the highest-confidence mappings
+- `confidence` — sort low-to-high to find the weakest mappings
 
-# 2. Open data/phenotype/review_mappings.tsv in Excel/Google Sheets
-#    Flag issues in the "flag" column: remove, broad, narrow, close, related, exact
-#    Save the file
-
-# 3. Apply your flags
-uv run python scripts/phenotype/v0.0.1/10_apply_review.py
-
-# 4. Generate a new version
-uv run python scripts/phenotype/v0.0.1/04_generate_output.py --version 0.0.2
-uv run python scripts/phenotype/v0.0.1/05_quality_report.py --version 0.0.2
-```
+To fix issues, create a new version with correction scripts (see [Creating a new version](#creating-a-new-version)).
 
 ## Contributing
 

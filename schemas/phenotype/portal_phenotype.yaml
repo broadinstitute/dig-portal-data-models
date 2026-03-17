@@ -54,9 +54,10 @@ classes:
         range: string
         required: true
         description: "Original text-based phenotype ID from Phenotypes.tsv"
-      legacy_trait_group:
-        range: TraitGroupEnum
+      gwas_source_category:
+        range: GwasSourceCategoryEnum
         required: true
+        description: "Source collection the phenotype originated from (portal, gcat_trait, rare_v2)"
       phenotype_name:
         range: string
         required: true
@@ -64,9 +65,13 @@ classes:
       description:
         range: string
         description: "Extended description if available"
-      display_group:
+      legacy_trait_group:
         range: string
-        description: "Disease area category (e.g., CARDIOVASCULAR)"
+        description: "Original display_group from Phenotypes.tsv (e.g., ECG_TRAITS, ATRIAL_FIBRILLATION)"
+      trait_group:
+        range: TraitGroupCategoryEnum
+        required: true
+        description: "Standardized biological trait group (consolidated from legacy_trait_group)"
       trait_type:
         range: TraitTypeEnum
         required: true
@@ -122,7 +127,8 @@ classes:
         description: "Additional notes or justification"
 
 enums:
-  TraitGroupEnum:
+  GwasSourceCategoryEnum:
+    description: "Source collection the phenotype originated from"
     permissible_values:
       portal:
         description: "Core portal phenotype"
@@ -130,6 +136,72 @@ enums:
         description: "GWAS Catalog-sourced trait"
       rare_v2:
         description: "Rare disease from Orphanet"
+
+  TraitGroupCategoryEnum:
+    description: >-
+      Standardized biological trait group. Consolidates 55 legacy display_groups
+      into 30 well-defined categories based on biological system or domain.
+    permissible_values:
+      aging:
+        description: "Aging, longevity, and lifespan traits. Legacy: AGING_AND_LONGEVITY"
+      anthropometric:
+        description: "Body measurements, composition, and physical activity. Legacy: ANTHROPOMETRIC, GIANT_PHENOTYPES, PHYSICAL_ACTIVITY"
+      cancer:
+        description: "All neoplasms and cancer types. Legacy: CANCER"
+      cardiovascular:
+        description: "Heart, vasculature, ECG, atrial fibrillation, stroke, cerebrovascular. Legacy: CARDIOVASCULAR, ECG_TRAITS, ATRIAL_FIBRILLATION, STROKE, VASCULAR, CEREBROVASCULAR_MRI_TRAITS, HERMES_PHENOTYPES"
+      congenital:
+        description: "Congenital anomalies, chromosomal abnormalities, developmental disorders. Legacy: DEVELOPMENTAL, GENETIC, NEPHBCH"
+      dental:
+        description: "Dental and oral health traits. Legacy: DENTAL"
+      dermatological:
+        description: "Skin conditions and dermatological traits. Legacy: DERMATOLOGICAL, SKIN_CONDITIONS, SKIN_KNOWLEDGE_PORTAL"
+      digestive:
+        description: "Gastrointestinal and inflammatory bowel diseases. Legacy: DIGESTIVE, INFLAMMATORY_BOWEL"
+      endocrine:
+        description: "Endocrine and hormonal traits. Legacy: ENDOCRINE"
+      ent:
+        description: "Ear, nose, and throat (hearing, otolaryngological). Legacy: HEARING, OTOLARYNGOLOGICAL"
+      environmental:
+        description: "Environmental exposures and toxicology measurements. Legacy: ENVIRONMENTAL_EXPOSURE"
+      hematological:
+        description: "Blood and blood-forming tissue measurements. Legacy: HEMATOLOGICAL"
+      hepatic:
+        description: "Liver and hepatobiliary traits. Legacy: HEPATIC"
+      immunological:
+        description: "Immune system traits and autoimmune conditions. Legacy: IMMUNOLOGICAL"
+      infectious:
+        description: "Infectious diseases including COVID-19. Legacy: INFECTIOUS, COVID-19"
+      lipids:
+        description: "Lipid and cholesterol measurements. Legacy: LIPIDS, IGVF_LIPIDS"
+      metabolic:
+        description: "Metabolic traits, glycemic measures, diabetic complications. Legacy: METABOLIC, GLYCEMIC, DIABETIC_COMPLICATIONS, TYPE_1_DIABETES"
+      metabolite:
+        description: "Metabolite and small molecule measurements. Legacy: METABOLITE"
+      musculoskeletal:
+        description: "Bone, muscle, and joint traits. Legacy: MUSCULOSKELETAL"
+      neurological:
+        description: "Neurological and cognitive traits. Legacy: NEUROLOGICAL, COGNITIVE"
+      nutritional:
+        description: "Nutritional status and dietary biomarkers. Legacy: NUTRITIONAL"
+      ocular:
+        description: "Eye and vision traits. Legacy: OCULAR, VISION_GENOMICS"
+      pharmacogenomics:
+        description: "Drug response and pharmacogenomic traits. Legacy: PHARMACOGENOMICS, SULFONYLUREA_RESPONSE, METFORMIN_RESPONSE"
+      protein_biology:
+        description: "Protein level measurements in blood. Legacy: PROTEIN_BIOLOGY"
+      psychiatric:
+        description: "Psychiatric and behavioral traits. Legacy: PSYCHIATRIC"
+      renal:
+        description: "Kidney and urological traits. Legacy: RENAL"
+      reproductive:
+        description: "Reproductive and fertility traits. Legacy: REPRODUCTIVE_TRAITS"
+      respiratory:
+        description: "Lung and respiratory traits. Legacy: LUNG"
+      sleep:
+        description: "Sleep, circadian rhythm, and fatigue traits. Legacy: SLEEP_AND_CIRCADIAN, PRIVATE_SLEEP_PORTAL"
+      other:
+        description: "Traits not fitting other categories. Legacy: NON-ADDITIVE_MODELS, OTHER"
 
   TraitTypeEnum:
     permissible_values:

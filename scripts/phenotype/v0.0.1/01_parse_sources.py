@@ -29,6 +29,90 @@ OUT.mkdir(exist_ok=True, parents=True)
 
 
 # ──────────────────────────────────────────────────────────
+# Legacy display_group → standardized trait_group mapping
+# Consolidates 55 legacy groups into ~30 biological categories
+# ──────────────────────────────────────────────────────────
+DISPLAY_GROUP_TO_TRAIT_GROUP = {
+    # Cardiovascular cluster
+    "CARDIOVASCULAR": "cardiovascular",
+    "ECG_TRAITS": "cardiovascular",
+    "ATRIAL_FIBRILLATION": "cardiovascular",
+    "STROKE": "cardiovascular",
+    "VASCULAR": "cardiovascular",
+    "CEREBROVASCULAR_MRI_TRAITS": "cardiovascular",
+    "HERMES_PHENOTYPES": "cardiovascular",
+    # Metabolic cluster
+    "METABOLIC": "metabolic",
+    "GLYCEMIC": "metabolic",
+    "DIABETIC_COMPLICATIONS": "metabolic",
+    "TYPE_1_DIABETES": "metabolic",
+    # Skin cluster
+    "DERMATOLOGICAL": "dermatological",
+    "SKIN_CONDITIONS": "dermatological",
+    "SKIN_KNOWLEDGE_PORTAL": "dermatological",
+    # Eye cluster
+    "OCULAR": "ocular",
+    "VISION_GENOMICS": "ocular",
+    # Lipids cluster
+    "LIPIDS": "lipids",
+    "IGVF_LIPIDS": "lipids",
+    # Anthropometric cluster
+    "ANTHROPOMETRIC": "anthropometric",
+    "GIANT_PHENOTYPES": "anthropometric",
+    "PHYSICAL_ACTIVITY": "anthropometric",
+    # ENT cluster
+    "HEARING": "ent",
+    "OTOLARYNGOLOGICAL": "ent",
+    # Sleep cluster
+    "SLEEP_AND_CIRCADIAN": "sleep",
+    "PRIVATE_SLEEP_PORTAL": "sleep",
+    # Digestive cluster
+    "DIGESTIVE": "digestive",
+    "INFLAMMATORY_BOWEL": "digestive",
+    # Infectious cluster
+    "INFECTIOUS": "infectious",
+    "COVID-19": "infectious",
+    # Neurological cluster
+    "NEUROLOGICAL": "neurological",
+    "COGNITIVE": "neurological",
+    # Developmental/congenital cluster
+    "DEVELOPMENTAL": "congenital",
+    "GENETIC": "congenital",
+    "NEPHBCH": "congenital",
+    # Pharmacogenomics cluster
+    "PHARMACOGENOMICS": "pharmacogenomics",
+    "SULFONYLUREA_RESPONSE": "pharmacogenomics",
+    "METFORMIN_RESPONSE": "pharmacogenomics",
+    # Respiratory (rename from LUNG)
+    "LUNG": "respiratory",
+    # Direct mappings (1:1)
+    "AGING_AND_LONGEVITY": "aging",
+    "CANCER": "cancer",
+    "DENTAL": "dental",
+    "ENDOCRINE": "endocrine",
+    "ENVIRONMENTAL_EXPOSURE": "environmental",
+    "HEMATOLOGICAL": "hematological",
+    "HEPATIC": "hepatic",
+    "IMMUNOLOGICAL": "immunological",
+    "METABOLITE": "metabolite",
+    "MUSCULOSKELETAL": "musculoskeletal",
+    "NUTRITIONAL": "nutritional",
+    "PROTEIN_BIOLOGY": "protein_biology",
+    "PSYCHIATRIC": "psychiatric",
+    "RENAL": "renal",
+    "REPRODUCTIVE_TRAITS": "reproductive",
+    # Catch-all
+    "NON-ADDITIVE_MODELS": "other",
+    "OTHER": "other",
+}
+
+
+def map_trait_group(display_group: str) -> str:
+    """Map a legacy display_group to a standardized trait_group."""
+    return DISPLAY_GROUP_TO_TRAIT_GROUP.get(display_group, "other")
+
+
+# ──────────────────────────────────────────────────────────
 # 1. Parse Phenotypes.tsv
 # ──────────────────────────────────────────────────────────
 def parse_phenotypes(path: Path) -> list[dict]:
@@ -38,10 +122,10 @@ def parse_phenotypes(path: Path) -> list[dict]:
     for _, row in df.iterrows():
         records.append(
             {
-                "trait_group": row["trait_group"],
+                "gwas_source_category": row["trait_group"],
                 "phenotype": row["phenotype"],
                 "phenotype_name": row["phenotype_name"],
-                "display_group": row["display_group"],
+                "legacy_trait_group": row["display_group"],
             }
         )
     print(f"  Phenotypes.tsv: {len(records)} rows")
@@ -380,12 +464,12 @@ def main():
 
     for pheno in phenotypes:
         stats["total"] += 1
-        stats["by_group"][pheno["trait_group"]] += 1
+        stats["by_group"][pheno["gwas_source_category"]] += 1
 
         phenotype_id = pheno["phenotype"]
-        trait_group = pheno["trait_group"]
+        trait_group = pheno["gwas_source_category"]
         phenotype_name = pheno["phenotype_name"]
-        display_group = pheno["display_group"]
+        display_group = pheno["legacy_trait_group"]
 
         # Get AMP info if available
         amp_info = amp_mappings.get(phenotype_id)
@@ -491,10 +575,11 @@ def main():
 
         # Build record
         record = {
-            "trait_group": trait_group,
+            "gwas_source_category": trait_group,
             "phenotype": phenotype_id,
             "phenotype_name": phenotype_name,
-            "display_group": display_group,
+            "legacy_trait_group": display_group,
+            "trait_group": map_trait_group(display_group),
             "trait_type": trait_type,
             "mappings": mappings,
         }
